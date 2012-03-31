@@ -1,0 +1,127 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>se.ericsson.sig.oauth</groupId>
+		<artifactId>oauth-project</artifactId>
+		<version>1.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+	<artifactId>oauth-core</artifactId>
+	<packaging>jar</packaging>
+	<name>ECE OAuth Core</name>
+
+	<properties>
+		<dbunit.version>2.4.8</dbunit.version>
+		<h2.version>1.3.165</h2.version>
+		<slf4j.version>1.6.4</slf4j.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.dbunit</groupId>
+			<artifactId>dbunit</artifactId>
+			<version>${dbunit.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>${h2.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- slf4j : dbunit task needed.-->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<!-- TODO: recreate mysql -->
+			<id>refresh-db</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.5</version>
+						<configuration>
+							<target>
+								<property file="src/main/resources/application.properties" />
+								<property name="sql.type" value="mysql" />
+								<property name="dbunit.datatype" value="org.dbunit.ext.h2.H2DataTypeFactory" />
+								<taskdef name="dbunit" classname="org.dbunit.ant.DbUnitTask"
+									classpathref="maven.test.classpath" />
+								<sql driver="${jdbc.driver}" url="${jdbc.url}" userid="${jdbc.username}"
+									password="${jdbc.password}" src="src/main/resources/sql/${sql.type}/schema.sql"
+									onerror="continue">
+									<classpath refid="maven.test.classpath" />
+								</sql>
+								<dbunit driver="${jdbc.driver}" url="${jdbc.url}" userid="${jdbc.username}"
+									password="${jdbc.password}">
+									<dbconfig>
+										<property name="datatypeFactory" value="${dbunit.datatype}" />
+									</dbconfig>
+									<classpath refid="maven.test.classpath" />
+									
+									<operation type="CLEAN_INSERT"
+										src="src/test/resources/data/sample-data.xml" format="flat"
+										transaction="true" />
+								</dbunit>
+							</target>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>	
+		<profile>
+			<id>refresh-db-h2</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.5</version>
+						<configuration>
+							<target>
+								<property file="src/main/resources/application.properties" />
+								<property name="sql.type" value="h2" />
+								<property name="dbunit.datatype" value="org.dbunit.ext.h2.H2DataTypeFactory" />
+								<taskdef name="dbunit" classname="org.dbunit.ant.DbUnitTask"
+									classpathref="maven.test.classpath" />
+
+								<echo>Waiting for the h2 server start...</echo>
+								<waitfor maxwait="500" maxwaitunit="second">
+									<and>
+										<socket server="localhost" port="9092" />
+									</and>
+								</waitfor>
+								<echo>The h2 server started.</echo>
+								<sql driver="${jdbc.driver}" url="${jdbc.url}" userid="${jdbc.username}"
+									password="${jdbc.password}" src="src/main/resources/sql/${sql.type}/schema.sql"
+									onerror="continue">
+									<classpath refid="maven.test.classpath" />
+								</sql>
+								<dbunit driver="${jdbc.driver}" url="${jdbc.url}" userid="${jdbc.username}"
+									password="${jdbc.password}">
+									<dbconfig>
+										<property name="datatypeFactory" value="${dbunit.datatype}" />
+									</dbconfig>
+									<classpath refid="maven.test.classpath" />
+									<operation type="CLEAN_INSERT"
+										src="src/test/resources/data/sample-data.xml" format="flat"
+										transaction="true" />
+								</dbunit>
+							</target>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

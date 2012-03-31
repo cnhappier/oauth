@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+  <oauth_user ID="1" EMAIL="jack@springside.org.cn" LOGIN_NAME="user1" NAME="Jack" PASSWORD="user1"/>
+  <oauth_user ID="2" EMAIL="kate@springside.org.cn" LOGIN_NAME="user2" NAME="Kate" PASSWORD="user2"/>
+</dataset>
