@@ -11,17 +11,26 @@
 	<packaging>war</packaging>
 	<name>ECE OAuth Server</name>
 
-	<properties>
-		<eceoauth.version>1.0-SNAPSHOT</eceoauth.version>
-		<!-- which version? -->
-		<jetty.version>7.6.2.v20120308</jetty.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>se.ericsson.sig.oauth</groupId>
 			<artifactId>oauth-core</artifactId>
-			<version>${eceoauth.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-library</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -50,11 +59,18 @@
 			<plugin>
 				<groupId>org.mortbay.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
-				<version>${jetty.version}</version>
 				<configuration>
 					<webAppConfig>
 						<contextPath>/oauth</contextPath>
 					</webAppConfig>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<configuration>
+					<wtpversion>2.0</wtpversion>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -73,29 +89,6 @@
 								<include>**/*IT.java</include>
 							</includes>
 						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>org.mortbay.jetty</groupId>
-						<artifactId>jetty-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>start-jetty</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<daemon>true</daemon>
-								</configuration>
-							</execution>
-							<execution>
-								<id>stop-jetty</id>
-								<phase>post-integration-test</phase>
-								<goals>
-									<goal>stop</goal>
-								</goals>
-							</execution>
-						</executions>
 					</plugin>
 				</plugins>
 			</build>
