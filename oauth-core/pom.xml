@@ -20,20 +20,14 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
 	</dependencies>
 
-<!-- wtp needed? -->
 	<build>
 		<plugins>
-			<!-- eclipse plugin -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<configuration>
-					<wtpversion>none</wtpversion>
-				</configuration>
-			</plugin>
-
 			<!-- source attach plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -49,14 +43,12 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<profiles>
-	<!-- UT-mysql, FT-mysql, Eclipse-mysql -->
-	<!-- DBUnit to init data for FT, Eclipse -->
-	<!-- DAO in test case -->
+		<!-- UT-mysql, FT-mysql, Eclipse-mysql -->
+		<!-- DBUnit to init data for FT, Eclipse -->
+		<!-- DAO in test case -->
 		<profile>
-			<!-- TODO: recreate mysql -->
-			<!--  -->
 			<id>refresh-db</id>
 			<build>
 				<plugins>
@@ -67,26 +59,30 @@
 						<configuration>
 							<target>
 								<property file="src/main/resources/application.properties" />
-								<property name="sql.type" value="mysql" />
-								<property name="dbunit.datatype" value="org.dbunit.ext.h2.H2DataTypeFactory" />
-								<taskdef name="dbunit" classname="org.dbunit.ant.DbUnitTask"
-									classpathref="maven.test.classpath" />
 								<sql driver="${jdbc.driver}" url="${jdbc.url}" userid="${jdbc.username}"
-									password="${jdbc.password}" src="src/main/resources/sql/${sql.type}/schema.sql"
-									onerror="continue">
+									password="${jdbc.password}" onerror="continue">
 									<classpath refid="maven.test.classpath" />
+									<path>
+										<fileset dir="src/main/resources/sql/">
+											<include name="*.sql" />
+										</fileset>
+									</path>
 								</sql>
+								<!-- 
+								<property name="dbunit.datatype" value="org.dbunit.ext.mysql.MySqlDataTypeFactory" />
+								<taskdef name="dbunit" classname="org.dbunit.ant.DbUnitTask" classpathref="maven.test.classpath" />
 								<dbunit driver="${jdbc.driver}" url="${jdbc.url}" userid="${jdbc.username}"
 									password="${jdbc.password}">
 									<dbconfig>
 										<property name="datatypeFactory" value="${dbunit.datatype}" />
 									</dbconfig>
 									<classpath refid="maven.test.classpath" />
-									
+
 									<operation type="CLEAN_INSERT"
 										src="src/test/resources/data/sample-data.xml" format="flat"
 										transaction="true" />
 								</dbunit>
+								 -->
 							</target>
 						</configuration>
 					</plugin>
